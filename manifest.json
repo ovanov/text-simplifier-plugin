@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Einfach-Deutsch Thesis Plugin",
+  "name": "EinfachLesen",
   "version": "1.0",
   "description": "Simplifies German news articles for L2 learners.",
-  "permissions": ["activeTab", "scripting"],
+  "permissions": ["activeTab", "scripting", "storage"],
   "host_permissions": [
     "http://localhost:8000/*",
     "https://*.tagesschau.de/*",
@@ -15,8 +15,8 @@
   "content_scripts": [
     {
       "matches": ["https://*.tagesschau.de/*", "https://*.spiegel.de/*"],
-      "js": ["content.js"],
-      "css": ["styles.css"]
+      "js": ["dist/content.js"],
+      "css": ["style.css"]
     }
   ]
 }

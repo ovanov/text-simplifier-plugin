@@ -1,41 +1,95 @@
-// Function to inject the simplification UI
-function injectSimplifier() {
-  // Target common news paragraph tags
-  const paragraphs = document.querySelectorAll('article p, .article-content p');
+interface SimplifyResponse {
+  simplified_text: string;
+  model_used: string;
+}
 
-  paragraphs.forEach((p, index) => {
-    // Prevent double injection if script runs twice
-    if (p.dataset.simplified) return;
-    p.dataset.simplified = "true";
+interface ExtensionSettings {
+  backendUrl: string;
+  model: string;
+  apiKey: string;
+}
 
-    const container = document.createElement('div');
-    container.className = "simplifier-container";
+const DEFAULT_SETTINGS: ExtensionSettings = {
+  backendUrl: "http://localhost:8000",
+  model: "huggingface-default",
+  apiKey: "",
+};
 
-    const btn = document.createElement('button');
-    btn.innerText = "✨ Text vereinfachen";
+async function getSettings(): Promise<ExtensionSettings> {
+  return new Promise((resolve) => {
+    chrome.storage.local.get(
+      { ...DEFAULT_SETTINGS } as { [key: string]: unknown },
+      (items) => {
+        resolve({
+          backendUrl: items.backendUrl as string,
+          model: items.model as string,
+          apiKey: items.apiKey as string,
+        });
+      }
+    );
+  });
+}
+
+function displayResult(targetElement: Element, simplifiedText: string): void {
+  const resultDiv = document.createElement("div");
+  resultDiv.className = "simplified-result-box";
+
+  const label = document.createElement("small");
+  const bold = document.createElement("b");
+  bold.textContent = "Einfache Sprache:";
+  label.appendChild(bold);
+
+  const paragraph = document.createElement("p");
+  paragraph.textContent = simplifiedText;
+
+  resultDiv.appendChild(label);
+  resultDiv.appendChild(paragraph);
+  targetElement.after(resultDiv);
+}
+
+function injectSimplifier(): void {
+  const paragraphs = document.querySelectorAll("article p, .article-content p");
+
+  paragraphs.forEach((p) => {
+    if ((p as HTMLElement).dataset.simplified) return;
+    (p as HTMLElement).dataset.simplified = "true";
+
+    const btn = document.createElement("button");
+    btn.textContent = "\u2728 Text vereinfachen";
     btn.className = "simplify-btn";
 
     btn.onclick = async () => {
-      const originalText = p.innerText;
-      btn.innerText = "⏳ Verarbeite...";
+      const originalText = (p as HTMLElement).innerText;
+      btn.textContent = "\u23F3 Verarbeite...";
       btn.disabled = true;
 
       try {
-        const response = await fetch('http://localhost:8000/simplify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ 
-            text: originalText,
-            method: "icl" // This can be changed via popup later
-          })
+        const settings = await getSettings();
+        const body: Record<string, string> = {
+          text: originalText,
+          model: settings.model,
+        };
+        if (settings.apiKey) {
+          body.api_key = settings.apiKey;
+        }
+
+        const response = await fetch(`${settings.backendUrl}/simplify`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
         });
 
-        const data = await response.json();
-        displayResult(p, data.simplified);
-        btn.innerText = "✅ Fertig";
+        if (!response.ok) {
+          const err = await response.json();
+          throw new Error(err.detail || response.statusText);
+        }
+
+        const data: SimplifyResponse = await response.json();
+        displayResult(p, data.simplified_text);
+        btn.textContent = "\u2705 Fertig";
       } catch (error) {
-        console.error("Error:", error);
-        btn.innerText = "❌ Fehler (Server an?)";
+        console.error("EinfachLesen error:", error);
+        btn.textContent = "\u274C Fehler (Server an?)";
         btn.disabled = false;
       }
     };
@@ -44,15 +98,4 @@ function injectSimplifier() {
   });
 }
 
-function displayResult(targetElement, simplifiedText) {
-  const resultDiv = document.createElement('div');
-  resultDiv.className = "simplified-result-box";
-  resultDiv.innerHTML = `
-    <small><b>Einfache Sprache:</b></small>
-    <p>${simplifiedText}</p>
-  `;
-  targetElement.after(resultDiv);
-}
-
-// Run on load
 injectSimplifier();
