@@ -16,6 +16,9 @@ const DEFAULT_SETTINGS: ExtensionSettings = {
 };
 
 async function getSettings(): Promise<ExtensionSettings> {
+  if (!chrome?.storage?.local) {
+    throw new Error("Extension-Kontext ungültig. Bitte Seite neu laden.");
+  }
   return new Promise((resolve) => {
     chrome.storage.local.get(
       { ...DEFAULT_SETTINGS } as { [key: string]: unknown },
@@ -89,7 +92,8 @@ function injectSimplifier(): void {
         btn.textContent = "\u2705 Fertig";
       } catch (error) {
         console.error("EinfachLesen error:", error);
-        btn.textContent = "\u274C Fehler (Server an?)";
+        const msg = error instanceof Error ? error.message : "Server an?";
+        btn.textContent = `\u274C ${msg}`;
         btn.disabled = false;
       }
     };

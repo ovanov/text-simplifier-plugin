@@ -5,6 +5,9 @@ const DEFAULT_SETTINGS = {
     apiKey: "",
 };
 async function getSettings() {
+    if (!chrome?.storage?.local) {
+        throw new Error("Extension-Kontext ungültig. Bitte Seite neu laden.");
+    }
     return new Promise((resolve) => {
         chrome.storage.local.get({ ...DEFAULT_SETTINGS }, (items) => {
             resolve({
@@ -65,7 +68,8 @@ function injectSimplifier() {
             }
             catch (error) {
                 console.error("EinfachLesen error:", error);
-                btn.textContent = "\u274C Fehler (Server an?)";
+                const msg = error instanceof Error ? error.message : "Server an?";
+                btn.textContent = `\u274C ${msg}`;
                 btn.disabled = false;
             }
         };

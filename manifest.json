@@ -21,7 +21,8 @@
     {
       "matches": [
         "https://*.tagesschau.de/*",
-        "https://*.spiegel.de/*"
+        "https://*.spiegel.de/*",
+        "https://*.20min.ch/*"
       ],
       "js": [
         "dist/content.js"
