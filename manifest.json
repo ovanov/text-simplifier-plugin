@@ -1,0 +1,22 @@
+{
+  "manifest_version": 3,
+  "name": "Einfach-Deutsch Thesis Plugin",
+  "version": "1.0",
+  "description": "Simplifies German news articles for L2 learners.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": [
+    "http://localhost:8000/*",
+    "https://*.tagesschau.de/*",
+    "https://*.spiegel.de/*"
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://*.tagesschau.de/*", "https://*.spiegel.de/*"],
+      "js": ["content.js"],
+      "css": ["styles.css"]
+    }
+  ]
+}
