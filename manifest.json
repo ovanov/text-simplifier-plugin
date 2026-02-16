@@ -3,20 +3,32 @@
   "name": "EinfachLesen",
   "version": "1.0",
   "description": "Simplifies German news articles for L2 learners.",
-  "permissions": ["activeTab", "scripting", "storage"],
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
   "host_permissions": [
     "http://localhost:8000/*",
     "https://*.tagesschau.de/*",
-    "https://*.spiegel.de/*"
+    "https://*.spiegel.de/*",
+    "https://*.20min.ch/*"
   ],
   "action": {
     "default_popup": "popup.html"
   },
   "content_scripts": [
     {
-      "matches": ["https://*.tagesschau.de/*", "https://*.spiegel.de/*"],
-      "js": ["dist/content.js"],
-      "css": ["style.css"]
+      "matches": [
+        "https://*.tagesschau.de/*",
+        "https://*.spiegel.de/*"
+      ],
+      "js": [
+        "dist/content.js"
+      ],
+      "css": [
+        "style.css"
+      ]
     }
   ]
 }
