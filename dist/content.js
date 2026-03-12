@@ -3,6 +3,7 @@ const DEFAULT_SETTINGS = {
     backendUrl: "http://localhost:8000",
     model: "huggingface-default",
     apiKey: "",
+    authToken: "",
 };
 async function getSettings() {
     if (!chrome?.storage?.local) {
@@ -14,6 +15,7 @@ async function getSettings() {
                 backendUrl: items.backendUrl,
                 model: items.model,
                 apiKey: items.apiKey,
+                authToken: items.authToken,
             });
         });
     });
@@ -53,11 +55,20 @@ function injectSimplifier() {
                 if (settings.apiKey) {
                     body.api_key = settings.apiKey;
                 }
+                const headers = {
+                    "Content-Type": "application/json",
+                };
+                if (settings.authToken) {
+                    headers["Authorization"] = `Bearer ${settings.authToken}`;
+                }
                 const response = await fetch(`${settings.backendUrl}/simplify`, {
                     method: "POST",
-                    headers: { "Content-Type": "application/json" },
+                    headers,
                     body: JSON.stringify(body),
                 });
+                if (response.status === 401) {
+                    throw new Error("Bitte melde dich an (Klicke auf das EinfachLesen-Symbol)");
+                }
                 if (!response.ok) {
                     const err = await response.json();
                     throw new Error(err.detail || response.statusText);

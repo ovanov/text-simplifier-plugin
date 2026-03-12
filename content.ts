@@ -7,12 +7,14 @@ interface ExtensionSettings {
   backendUrl: string;
   model: string;
   apiKey: string;
+  authToken: string;
 }
 
 const DEFAULT_SETTINGS: ExtensionSettings = {
   backendUrl: "http://localhost:8000",
   model: "huggingface-default",
   apiKey: "",
+  authToken: "",
 };
 
 async function getSettings(): Promise<ExtensionSettings> {
@@ -27,6 +29,7 @@ async function getSettings(): Promise<ExtensionSettings> {
           backendUrl: items.backendUrl as string,
           model: items.model as string,
           apiKey: items.apiKey as string,
+          authToken: items.authToken as string,
         });
       }
     );
@@ -76,11 +79,22 @@ function injectSimplifier(): void {
           body.api_key = settings.apiKey;
         }
 
+        const headers: Record<string, string> = {
+          "Content-Type": "application/json",
+        };
+        if (settings.authToken) {
+          headers["Authorization"] = `Bearer ${settings.authToken}`;
+        }
+
         const response = await fetch(`${settings.backendUrl}/simplify`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers,
           body: JSON.stringify(body),
         });
+
+        if (response.status === 401) {
+          throw new Error("Bitte melde dich an (Klicke auf das EinfachLesen-Symbol)");
+        }
 
         if (!response.ok) {
           const err = await response.json();

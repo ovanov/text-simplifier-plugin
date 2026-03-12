@@ -17,7 +17,7 @@
       font-weight: 600;
       margin: 8px 0 4px;
     }
-    select, input[type="text"], input[type="password"] {
+    select, input[type="text"], input[type="password"], input[type="email"] {
       width: 100%;
       padding: 6px 8px;
       border: 1px solid #ccc;
@@ -46,27 +46,110 @@
     .status.connected { color: green; }
     .status.disconnected { color: red; }
     #api-key-group { display: none; }
+
+    /* Auth styles */
+    #auth-view { display: none; }
+    #settings-view { display: none; }
+
+    .auth-tabs {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+    }
+    .auth-tabs a {
+      text-decoration: none;
+      color: #666;
+      font-weight: 600;
+      font-size: 13px;
+      padding-bottom: 4px;
+      cursor: pointer;
+    }
+    .auth-tabs a.active {
+      color: #0055aa;
+      border-bottom: 2px solid #0055aa;
+    }
+    .auth-error {
+      color: #cc0000;
+      font-size: 11px;
+      margin-top: 6px;
+      min-height: 14px;
+    }
+    #display-name-group { display: none; }
+
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #f0f4f8;
+      padding: 6px 8px;
+      border-radius: 4px;
+      margin-bottom: 10px;
+      font-size: 11px;
+    }
+    .user-bar span { color: #333; }
+    .user-bar a {
+      color: #0055aa;
+      text-decoration: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .user-bar a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <h3>EinfachLesen</h3>
 
-  <label for="model-select">Modell</label>
-  <select id="model-select">
-    <option value="huggingface-default">Laden...</option>
-  </select>
+  <!-- Auth View -->
+  <div id="auth-view">
+    <div class="auth-tabs">
+      <a id="tab-login" class="active">Anmelden</a>
+      <a id="tab-register">Registrieren</a>
+    </div>
 
-  <div id="api-key-group">
-    <label for="api-key">API Key</label>
-    <input type="password" id="api-key" placeholder="sk-...">
+    <label for="auth-email">E-Mail</label>
+    <input type="email" id="auth-email" placeholder="name@beispiel.de">
+
+    <label for="auth-password">Passwort</label>
+    <input type="password" id="auth-password" placeholder="Passwort">
+
+    <div id="display-name-group">
+      <label for="auth-display-name">Anzeigename</label>
+      <input type="text" id="auth-display-name" placeholder="Dein Name">
+    </div>
+
+    <button id="auth-submit-btn">Anmelden</button>
+    <div id="auth-error" class="auth-error"></div>
+
+    <label for="auth-backend-url">Backend URL</label>
+    <input type="text" id="auth-backend-url" value="http://localhost:8000">
   </div>
 
-  <label for="backend-url">Backend URL</label>
-  <input type="text" id="backend-url" value="http://localhost:8000">
+  <!-- Settings View -->
+  <div id="settings-view">
+    <div class="user-bar">
+      <span id="user-email"></span>
+      <a id="logout-btn">Abmelden</a>
+    </div>
 
-  <button id="save-btn">Speichern</button>
+    <label for="model-select">Modell</label>
+    <select id="model-select">
+      <option value="huggingface-default">Laden...</option>
+    </select>
 
-  <div id="status" class="status">Verbinde...</div>
+    <div id="api-key-group">
+      <label for="api-key">API Key</label>
+      <input type="password" id="api-key" placeholder="sk-...">
+    </div>
+
+    <label for="backend-url">Backend URL</label>
+    <input type="text" id="backend-url" value="http://localhost:8000">
+
+    <button id="save-btn">Speichern</button>
+
+    <div id="status" class="status">Verbinde...</div>
+  </div>
 
   <script src="dist/popup.js"></script>
 </body>
