@@ -2,6 +2,7 @@ interface ModelInfo {
   id: string;
   name: string;
   requires_api_key: boolean;
+  type: "finetuned" | "proprietary";
 }
 
 interface ModelsResponse {
@@ -199,13 +200,29 @@ document.addEventListener("DOMContentLoaded", async () => {
       const data: ModelsResponse = await res.json();
 
       modelSelect.innerHTML = "";
-      data.models.forEach((m) => {
-        const option = document.createElement("option");
-        option.value = m.id;
-        option.textContent = m.name;
-        if (m.id === selectedModel) option.selected = true;
-        modelSelect.appendChild(option);
-      });
+
+      const groups: { type: ModelInfo["type"]; label: string }[] = [
+        { type: "finetuned", label: "Eigene Modelle" },
+        { type: "proprietary", label: "Proprietäre Modelle" },
+      ];
+
+      for (const group of groups) {
+        const groupModels = data.models.filter((m) => m.type === group.type);
+        if (groupModels.length === 0) continue;
+
+        const optgroup = document.createElement("optgroup");
+        optgroup.label = group.label;
+
+        for (const m of groupModels) {
+          const option = document.createElement("option");
+          option.value = m.id;
+          option.textContent = m.name;
+          if (m.id === selectedModel) option.selected = true;
+          optgroup.appendChild(option);
+        }
+
+        modelSelect.appendChild(optgroup);
+      }
 
       updateApiKeyVisibility(data.models);
       statusEl.textContent = "● Backend verbunden";
