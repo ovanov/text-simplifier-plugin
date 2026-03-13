@@ -171,25 +171,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             const res = await fetch(`${backendUrl}/models`);
             const data = await res.json();
             modelSelect.innerHTML = "";
-            const groups = [
-                { type: "finetuned", label: "Eigene Modelle" },
-                { type: "proprietary", label: "Proprietäre Modelle" },
-            ];
-            for (const group of groups) {
-                const groupModels = data.models.filter((m) => m.type === group.type);
-                if (groupModels.length === 0)
-                    continue;
-                const optgroup = document.createElement("optgroup");
-                optgroup.label = group.label;
-                for (const m of groupModels) {
-                    const option = document.createElement("option");
-                    option.value = m.id;
-                    option.textContent = m.name;
-                    if (m.id === selectedModel)
-                        option.selected = true;
-                    optgroup.appendChild(option);
-                }
-                modelSelect.appendChild(optgroup);
+            for (const m of data.models) {
+                const option = document.createElement("option");
+                option.value = m.id;
+                option.textContent = m.name;
+                if (m.id === selectedModel)
+                    option.selected = true;
+                modelSelect.appendChild(option);
             }
             updateApiKeyVisibility(data.models);
             statusEl.textContent = "● Backend verbunden";
