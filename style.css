@@ -35,3 +35,13 @@
   color: #333;
   box-shadow: 2px 2px 5px rgba(0,0,0,0.05);
 }
+
+.resimplify-btn {
+  margin-top: 10px;
+  font-size: 11px;
+  background-color: #00cc88;
+}
+
+.resimplify-btn:hover {
+  background-color: #00a870;
+}
