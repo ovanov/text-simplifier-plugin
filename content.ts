@@ -25,6 +25,33 @@ const DEFAULT_SETTINGS: ExtensionSettings = {
   authToken: "",
 };
 
+type ApiResult<T> =
+  | { ok: true; status: number; data: T }
+  | { ok: false; status: number; detail: string };
+
+interface ApiRequest {
+  type: "API_CALL";
+  method: "GET" | "POST" | "PATCH";
+  path: string;
+  body?: Record<string, unknown>;
+}
+
+async function callApi<T>(req: Omit<ApiRequest, "type">): Promise<ApiResult<T>> {
+  try {
+    const result = await chrome.runtime.sendMessage<ApiRequest, ApiResult<T>>({
+      type: "API_CALL",
+      ...req,
+    });
+    if (!result) {
+      return { ok: false, status: 0, detail: "Keine Antwort vom Hintergrund-Skript" };
+    }
+    return result;
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "Erweiterungsfehler";
+    return { ok: false, status: 0, detail };
+  }
+}
+
 const CEFR_LEVELS = ["B2", "B1", "A2", "A1"];
 
 function nextCefrLevel(current: string): string {
@@ -53,38 +80,23 @@ async function getSettings(): Promise<ExtensionSettings> {
 }
 
 async function getUserCefrLevel(): Promise<string> {
-  try {
-    const settings = await getSettings();
-    if (!settings.authToken) return "B2";
+  const settings = await getSettings();
+  if (!settings.authToken) return "B2";
 
-    const response = await fetch(`${settings.backendUrl}/auth/me`, {
-      headers: { Authorization: `Bearer ${settings.authToken}` },
-    });
-    if (!response.ok) return "B2";
-
-    const user: UserResponse = await response.json();
-    return user.cefr_level;
-  } catch {
-    return "B2";
-  }
+  const result = await callApi<UserResponse>({ method: "GET", path: "/auth/me" });
+  if (!result.ok) return "B2";
+  return result.data.cefr_level;
 }
 
 async function updateUserCefrLevel(level: string): Promise<void> {
-  try {
-    const settings = await getSettings();
-    if (!settings.authToken) return;
+  const settings = await getSettings();
+  if (!settings.authToken) return;
 
-    await fetch(`${settings.backendUrl}/auth/me`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${settings.authToken}`,
-      },
-      body: JSON.stringify({ cefr_level: level }),
-    });
-  } catch {
-    // Silently fail — level update is best-effort
-  }
+  await callApi<UserResponse>({
+    method: "PATCH",
+    path: "/auth/me",
+    body: { cefr_level: level },
+  });
 }
 
 function displayResult(
@@ -122,54 +134,41 @@ function displayResult(
     resimplifyBtn.textContent = "\u23F3 Verarbeite...";
     resimplifyBtn.disabled = true;
 
-    try {
-      // Update stored level if it actually changed
-      if (newLevel !== level) {
-        await updateUserCefrLevel(newLevel);
-      }
-      level = newLevel;
-
-      const settings = await getSettings();
-      const body: Record<string, string> = {
-        text: originalText,
-        simplified_text: lastSimplified,
-        target_level: level,
-        model: settings.model,
-      };
-      if (settings.apiKey) {
-        body.api_key = settings.apiKey;
-      }
-
-      const headers: Record<string, string> = {
-        "Content-Type": "application/json",
-      };
-      if (settings.authToken) {
-        headers["Authorization"] = `Bearer ${settings.authToken}`;
-      }
-
-      const response = await fetch(`${settings.backendUrl}/simplify`, {
-        method: "POST",
-        headers,
-        body: JSON.stringify(body),
-      });
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || response.statusText);
-      }
-
-      const data: SimplifyResponse = await response.json();
-      lastSimplified = data.simplified_text;
-      paragraph.textContent = lastSimplified;
-      bold.textContent = `Einfache Sprache (${level}):`;
-      resimplifyBtn.textContent = "Nochmals vereinfachen";
-      resimplifyBtn.disabled = false;
-    } catch (error) {
-      console.error("EinfachLesen re-simplify error:", error);
-      const msg = error instanceof Error ? error.message : "Fehler";
-      resimplifyBtn.textContent = `\u274C ${msg}`;
-      resimplifyBtn.disabled = false;
+    // Update stored level if it actually changed
+    if (newLevel !== level) {
+      await updateUserCefrLevel(newLevel);
     }
+    level = newLevel;
+
+    const settings = await getSettings();
+    const body: Record<string, unknown> = {
+      text: originalText,
+      simplified_text: lastSimplified,
+      target_level: level,
+      model: settings.model,
+    };
+    if (settings.apiKey) {
+      body.api_key = settings.apiKey;
+    }
+
+    const result = await callApi<SimplifyResponse>({
+      method: "POST",
+      path: "/simplify",
+      body,
+    });
+
+    if (!result.ok) {
+      console.error("EinfachLesen re-simplify error:", result);
+      resimplifyBtn.textContent = `\u274C ${result.detail || "Fehler"}`;
+      resimplifyBtn.disabled = false;
+      return;
+    }
+
+    lastSimplified = result.data.simplified_text;
+    paragraph.textContent = lastSimplified;
+    bold.textContent = `Einfache Sprache (${level}):`;
+    resimplifyBtn.textContent = "Nochmals vereinfachen";
+    resimplifyBtn.disabled = false;
   };
 
   resultDiv.appendChild(label);
@@ -195,48 +194,35 @@ async function injectSimplifier(): Promise<void> {
       btn.textContent = "\u23F3 Verarbeite...";
       btn.disabled = true;
 
-      try {
-        const settings = await getSettings();
-        const body: Record<string, string> = {
-          text: originalText,
-          target_level: userLevel,
-          model: settings.model,
-        };
-        if (settings.apiKey) {
-          body.api_key = settings.apiKey;
-        }
+      const settings = await getSettings();
+      const body: Record<string, unknown> = {
+        text: originalText,
+        target_level: userLevel,
+        model: settings.model,
+      };
+      if (settings.apiKey) {
+        body.api_key = settings.apiKey;
+      }
 
-        const headers: Record<string, string> = {
-          "Content-Type": "application/json",
-        };
-        if (settings.authToken) {
-          headers["Authorization"] = `Bearer ${settings.authToken}`;
-        }
+      const result = await callApi<SimplifyResponse>({
+        method: "POST",
+        path: "/simplify",
+        body,
+      });
 
-        const response = await fetch(`${settings.backendUrl}/simplify`, {
-          method: "POST",
-          headers,
-          body: JSON.stringify(body),
-        });
-
-        if (response.status === 401) {
-          throw new Error("Bitte melde dich an (Klicke auf das EinfachLesen-Symbol)");
-        }
-
-        if (!response.ok) {
-          const err = await response.json();
-          throw new Error(err.detail || response.statusText);
-        }
-
-        const data: SimplifyResponse = await response.json();
-        btn.remove();
-        displayResult(p, data.simplified_text, originalText, userLevel);
-      } catch (error) {
-        console.error("EinfachLesen error:", error);
-        const msg = error instanceof Error ? error.message : "Server an?";
+      if (!result.ok) {
+        console.error("EinfachLesen error:", result);
+        const msg =
+          result.status === 401
+            ? "Bitte melde dich an (Klicke auf das EinfachLesen-Symbol)"
+            : result.detail || "Fehler";
         btn.textContent = `\u274C ${msg}`;
         btn.disabled = false;
+        return;
       }
+
+      btn.remove();
+      displayResult(p, result.data.simplified_text, originalText, userLevel);
     };
 
     p.prepend(btn);

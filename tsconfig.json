@@ -10,5 +10,5 @@
     "esModuleInterop": true,
     "lib": ["ES2020", "DOM"]
   },
-  "include": ["content.ts", "popup.ts"]
+  "include": ["content.ts", "popup.ts", "background.ts"]
 }

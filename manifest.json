@@ -17,6 +17,15 @@
   "action": {
     "default_popup": "popup.html"
   },
+  "background": {
+    "service_worker": "dist/background.js",
+    "scripts": ["dist/background.js"]
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "einfachlesen@local"
+    }
+  },
   "content_scripts": [
     {
       "matches": [
