@@ -9,16 +9,9 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-size: 13px;
     }
-    h3 {
-      font-size: 15px;
-      margin: 0 0 10px 0;
-    }
-    label {
-      display: block;
-      font-weight: 600;
-      margin: 8px 0 4px;
-    }
-    select, input[type="text"], input[type="password"], input[type="email"] {
+    h3 { font-size: 15px; margin: 0 0 10px 0; }
+    label { display: block; font-weight: 600; margin: 8px 0 4px; }
+    select, input[type="text"] {
       width: 100%;
       padding: 6px 8px;
       border: 1px solid #ccc;
@@ -37,47 +30,18 @@
       cursor: pointer;
       font-size: 13px;
     }
-    button:hover {
-      background: #003d7a;
-    }
+    button:hover { background: #003d7a; }
+    button:disabled { background: #ccc; cursor: not-allowed; }
     .status {
       font-size: 11px;
       margin-top: 8px;
-    }
-    .status.connected { color: green; }
-    .status.disconnected { color: red; }
-    #api-key-group { display: none; }
-
-    /* Auth styles */
-    #auth-view { display: none; }
-    #settings-view { display: none; }
-
-    .auth-tabs {
-      display: flex;
-      gap: 16px;
-      margin-bottom: 12px;
-      border-bottom: 1px solid #ddd;
-      padding-bottom: 6px;
-    }
-    .auth-tabs a {
-      text-decoration: none;
-      color: #666;
-      font-weight: 600;
-      font-size: 13px;
-      padding-bottom: 4px;
-      cursor: pointer;
-    }
-    .auth-tabs a.active {
-      color: #0055aa;
-      border-bottom: 2px solid #0055aa;
-    }
-    .auth-error {
-      color: #cc0000;
-      font-size: 11px;
-      margin-top: 6px;
       min-height: 14px;
     }
-    #display-name-group { display: none; }
+    .status.error { color: #cc0000; }
+    .status.ok { color: green; }
+
+    #enroll-view { display: none; }
+    #logged-in-view { display: none; }
 
     .user-bar {
       display: flex;
@@ -89,7 +53,6 @@
       margin-bottom: 10px;
       font-size: 11px;
     }
-    .user-bar span { color: #333; }
     .user-bar a {
       color: #0055aa;
       text-decoration: none;
@@ -100,56 +63,36 @@
   </style>
 </head>
 <body>
-  <h3>EinfachLesen</h3>
+  <h3>EinfachLesen — Studie</h3>
 
-  <!-- Auth View -->
-  <div id="auth-view">
-    <div class="auth-tabs">
-      <a id="tab-login" class="active">Anmelden</a>
-      <a id="tab-register">Registrieren</a>
-    </div>
+  <div id="enroll-view">
+    <label for="first-name">Vorname</label>
+    <input type="text" id="first-name" placeholder="Vorname">
 
-    <label for="auth-email">E-Mail</label>
-    <input type="email" id="auth-email" placeholder="name@beispiel.de">
+    <label for="last-name">Nachname</label>
+    <input type="text" id="last-name" placeholder="Nachname">
 
-    <label for="auth-password">Passwort</label>
-    <input type="password" id="auth-password" placeholder="Passwort">
-
-    <div id="display-name-group">
-      <label for="auth-display-name">Anzeigename</label>
-      <input type="text" id="auth-display-name" placeholder="Dein Name">
-    </div>
-
-    <button id="auth-submit-btn">Anmelden</button>
-    <div id="auth-error" class="auth-error"></div>
-
-    <label for="auth-backend-url">Backend URL</label>
-    <input type="text" id="auth-backend-url" value="http://localhost:8000">
-  </div>
-
-  <!-- Settings View -->
-  <div id="settings-view">
-    <div class="user-bar">
-      <span id="user-email"></span>
-      <a id="logout-btn">Abmelden</a>
-    </div>
-
-    <label for="model-select">Modell</label>
-    <select id="model-select">
-      <option value="huggingface-default">Laden...</option>
+    <label for="cefr-level">Sprachniveau</label>
+    <select id="cefr-level">
+      <option value="A1">A1</option>
+      <option value="A2">A2</option>
+      <option value="B1" selected>B1</option>
+      <option value="B2">B2</option>
     </select>
-
-    <div id="api-key-group">
-      <label for="api-key">API Key</label>
-      <input type="password" id="api-key" placeholder="sk-...">
-    </div>
 
     <label for="backend-url">Backend URL</label>
     <input type="text" id="backend-url" value="http://localhost:8000">
 
-    <button id="save-btn">Speichern</button>
+    <button id="enroll-btn">Teilnehmen</button>
+    <div id="enroll-status" class="status"></div>
+  </div>
 
-    <div id="status" class="status">Verbinde...</div>
+  <div id="logged-in-view">
+    <div class="user-bar">
+      <span id="participant-name"></span>
+      <a id="logout-btn">Abmelden</a>
+    </div>
+    <div class="status ok">Angemeldet. Öffne einen unterstützten Artikel.</div>
   </div>
 
   <script src="dist/popup.js"></script>
