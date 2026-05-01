@@ -1,3 +1,5 @@
+import { BACKEND_URL } from "./src/config";
+
 interface BgApiRequest {
   type: "API_CALL";
   method: "GET" | "POST" | "PATCH";
@@ -10,12 +12,10 @@ type BgApiResult =
   | { ok: false; status: number; detail: string };
 
 interface BackgroundSettings {
-  backendUrl: string;
   authToken: string;
 }
 
 const DEFAULTS: BackgroundSettings = {
-  backendUrl: "http://localhost:8000",
   authToken: "",
 };
 
@@ -25,7 +25,6 @@ async function getBackgroundSettings(): Promise<BackgroundSettings> {
       { ...DEFAULTS } as { [key: string]: unknown },
       (items) => {
         resolve({
-          backendUrl: (items.backendUrl as string) || DEFAULTS.backendUrl,
           authToken: (items.authToken as string) || "",
         });
       },
@@ -34,7 +33,7 @@ async function getBackgroundSettings(): Promise<BackgroundSettings> {
 }
 
 async function performApiCall(req: BgApiRequest): Promise<BgApiResult> {
-  const { backendUrl, authToken } = await getBackgroundSettings();
+  const { authToken } = await getBackgroundSettings();
 
   const headers: Record<string, string> = {};
   if (req.body !== undefined) {
@@ -45,7 +44,7 @@ async function performApiCall(req: BgApiRequest): Promise<BgApiResult> {
   }
 
   try {
-    const response = await fetch(`${backendUrl}${req.path}`, {
+    const response = await fetch(`${BACKEND_URL}${req.path}`, {
       method: req.method,
       headers,
       body: req.body === undefined ? undefined : JSON.stringify(req.body),
