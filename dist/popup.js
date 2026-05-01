@@ -1,10 +1,10 @@
 "use strict";
 const DEFAULT_BACKEND_URL = "http://localhost:8000";
+const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 document.addEventListener("DOMContentLoaded", async () => {
     const enrollView = document.getElementById("enroll-view");
     const loggedInView = document.getElementById("logged-in-view");
-    const firstNameEl = document.getElementById("first-name");
-    const lastNameEl = document.getElementById("last-name");
+    const userIdEl = document.getElementById("user-id");
     const cefrEl = document.getElementById("cefr-level");
     const backendUrlEl = document.getElementById("backend-url");
     const enrollBtn = document.getElementById("enroll-btn");
@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     function showLoggedIn(user) {
         enrollView.style.display = "none";
         loggedInView.style.display = "block";
-        participantNameEl.textContent = `${user.first_name} ${user.last_name}`;
+        participantNameEl.textContent = `Teilnehmer ${user.id.slice(0, 8)}`;
     }
     function setError(msg) {
         statusEl.textContent = msg;
@@ -54,12 +54,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
     enrollBtn.addEventListener("click", async () => {
         clearStatus();
-        const firstName = firstNameEl.value.trim();
-        const lastName = lastNameEl.value.trim();
+        const userId = userIdEl.value.trim().toLowerCase();
         const selfCefr = cefrEl.value;
         const backendUrl = backendUrlEl.value.trim() || DEFAULT_BACKEND_URL;
-        if (!firstName || !lastName) {
-            setError("Bitte Vor- und Nachname eingeben.");
+        if (!UUID_V4_RE.test(userId)) {
+            setError("Ungültige User Id. Bitte aus der Bestätigungs-E-Mail kopieren.");
             return;
         }
         enrollBtn.disabled = true;
@@ -69,8 +68,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    first_name: firstName,
-                    last_name: lastName,
+                    user_id: userId,
                     self_reported_cefr: selfCefr,
                 }),
             });
