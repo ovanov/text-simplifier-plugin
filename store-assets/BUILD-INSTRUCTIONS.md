@@ -51,5 +51,5 @@ BACKEND_URL=https://<deployed-backend-url> npm run package:firefox
 
 ## Known maintenance points
 
-- The privacy-policy URL in `popup.html` (`<a href="...">Datenschutz</a>`) and in `store-assets/description-en.md` is a GitHub Pages URL on the same repo. If the privacy policy is moved to a separate repo, both files must be updated and a new build produced.
+- The privacy-policy URL in `popup.html` (`<a href="...">Datenschutz</a>`), in `store-assets/description-en.md`, and in `store-assets/description-de.md` is a GitHub Pages URL on the same repo. If the privacy policy is moved to a separate repo, all three files must be updated and a new build produced.
 - The backend URL is **never** committed to the source tree. The committed `src/config.ts` always defaults to `http://localhost:8000`. Production values are injected by the build script via the `BACKEND_URL` env var.
