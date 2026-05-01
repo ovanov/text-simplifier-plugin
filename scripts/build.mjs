@@ -36,9 +36,13 @@ await writeFile(join(stage, "manifest.json"), JSON.stringify(manifest, null, 2) 
 
 // 2. Compile TypeScript directly into the stage dir.
 const tscOutDir = join(stage, "dist");
-const tsc = spawnSync("npx", ["tsc", "--outDir", tscOutDir], {
+const tscBin = join(
+  "node_modules",
+  ".bin",
+  process.platform === "win32" ? "tsc.cmd" : "tsc",
+);
+const tsc = spawnSync(tscBin, ["--outDir", tscOutDir], {
   stdio: "inherit",
-  shell: true,
 });
 if (tsc.status !== 0) {
   console.error(`[build:${browser}] tsc failed`);
