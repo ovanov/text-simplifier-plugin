@@ -60,12 +60,36 @@
       font-weight: 600;
     }
     .user-bar a:hover { text-decoration: underline; }
+    .research-notice {
+      background: #f7f8fa;
+      border-left: 3px solid #0055aa;
+      padding: 8px 10px;
+      margin-bottom: 10px;
+      font-size: 11px;
+      line-height: 1.4;
+      color: #333;
+    }
+    .privacy-footer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 10px;
+    }
+    .privacy-footer a {
+      color: #0055aa;
+      text-decoration: none;
+    }
+    .privacy-footer a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <h3>EinfachLesen — Studie</h3>
 
   <div id="enroll-view">
+    <p class="research-notice">
+      EinfachLesen ist Teil einer Forschungsstudie der Universität Zürich.
+      Die User Id dient ausschliesslich der Zuordnung zu deiner Studienanmeldung —
+      es werden keine personenbezogenen Daten mit ihr verknüpft.
+    </p>
     <label for="user-id">User Id (aus der Bestätigungs-E-Mail)</label>
     <input type="text" id="user-id"
            placeholder="z. B. 0778ee0c-5c36-4905-ab91-89ef75b01391"
@@ -79,9 +103,6 @@
       <option value="B2">B2</option>
     </select>
 
-    <label for="backend-url">Backend URL</label>
-    <input type="text" id="backend-url" value="http://localhost:8000">
-
     <button id="enroll-btn">Teilnehmen</button>
     <div id="enroll-status" class="status"></div>
   </div>
@@ -94,6 +115,10 @@
     <div class="status ok">Angemeldet. Öffne einen unterstützten Artikel.</div>
   </div>
 
+  <div class="privacy-footer">
+    <a href="https://ovanov.github.io/text-simplifier-plugin/PRIVACY"
+       target="_blank" rel="noopener">Datenschutz</a>
+  </div>
   <script src="dist/popup.js"></script>
 </body>
 </html>
