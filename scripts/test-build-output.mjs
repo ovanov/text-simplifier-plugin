@@ -76,6 +76,20 @@ if (!configJs) {
   failures.push(`dist/src/config.js: BACKEND_URL was not set to ${expectedHost}`);
 }
 
+for (const f of ["dist/background.js", "dist/popup.js"]) {
+  const js = await readFile(join(root, f), "utf8").catch(() => null);
+  if (!js) {
+    failures.push(`missing: ${f}`);
+    continue;
+  }
+  if (/^import\s/m.test(js)) {
+    failures.push(`${f}: still contains an ESM import statement (must be inlined to run as classic script)`);
+  }
+  if (!js.includes(`const BACKEND_URL = "${expectedHost}";`)) {
+    failures.push(`${f}: does not contain inlined const BACKEND_URL = "${expectedHost}";`);
+  }
+}
+
 if (failures.length) {
   console.error(`FAIL (${browser}):\n  ` + failures.join("\n  "));
   process.exit(1);

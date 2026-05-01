@@ -55,6 +55,22 @@ const updatedConfigJs = configJs.replace(
 );
 await writeFile(configPath, updatedConfigJs);
 
+// Inline BACKEND_URL into background.js and popup.js so they can run as
+// classic scripts (MV3 service worker without `type:"module"`, Firefox
+// background.scripts, popup.html `<script>` tag). This keeps the source
+// tree using a single ESM-style import while producing classic-script
+// output bundles for both browsers.
+const importRe = /^import \{ BACKEND_URL \} from "\.\/src\/config";\s*\n/m;
+for (const f of ["background.js", "popup.js"]) {
+  const p = join(tscOutDir, f);
+  const txt = await readFile(p, "utf8");
+  if (!importRe.test(txt)) {
+    console.error(`[build:${browser}] expected BACKEND_URL import in ${f} but did not find one`);
+    process.exit(1);
+  }
+  await writeFile(p, txt.replace(importRe, `const BACKEND_URL = "${BACKEND_URL}";\n`));
+}
+
 // 4. Copy static assets.
 await cp("popup.html", join(stage, "popup.html"));
 await cp("style.css", join(stage, "style.css"));
