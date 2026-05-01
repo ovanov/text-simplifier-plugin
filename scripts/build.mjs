@@ -58,6 +58,9 @@ await writeFile(configPath, updatedConfigJs);
 // 4. Copy static assets.
 await cp("popup.html", join(stage, "popup.html"));
 await cp("style.css", join(stage, "style.css"));
-await cp("icons", join(stage, "icons"), { recursive: true });
+await cp("icons", join(stage, "icons"), {
+  recursive: true,
+  filter: (src) => !src.endsWith("store-128.png"),
+});
 
 console.log(`[build:${browser}] staged at ${stage}`);
