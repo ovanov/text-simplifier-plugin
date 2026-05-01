@@ -80,7 +80,8 @@ out
 
 # Nuxt.js build / generate output
 .nuxt
-# dist — kept for Chrome extension compiled output
+dist
+# dist — old per-tsc output; new build pipeline writes to build/<browser>/dist/
 
 # Gatsby files
 .cache/
