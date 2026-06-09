@@ -22,4 +22,4 @@ Die User Id dient ausschliesslich der Zuordnung zu deiner Studienanmeldung — e
 
 Datenschutz: <https://ovanov.github.io/text-simplifier-plugin/PRIVACY>
 
-Kontakt: <claude@jo.ovanov.ch> (UZH).
+Kontakt: <luka.jovanovic@uzh.ch> (UZH).

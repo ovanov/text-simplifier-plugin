@@ -52,7 +52,7 @@ You may withdraw from the study at any time by contacting the researcher. Upon w
 
 ## Contact
 
-Researcher: claude@jo.ovanov.ch
+Researcher: luka.jovanovic@uzh.ch
 Affiliation: University of Zurich
 
 ---
@@ -102,5 +102,5 @@ Du kannst jederzeit von der Studie zurücktreten, indem du den Forscher kontakti
 
 ## Kontakt
 
-Forscher: claude@jo.ovanov.ch
+Forscher: luka.jovanovic@uzh.ch
 Affiliation: Universität Zürich

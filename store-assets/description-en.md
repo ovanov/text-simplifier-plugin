@@ -25,7 +25,7 @@ For full details, see the privacy policy: <https://ovanov.github.io/text-simplif
 
 ## Contact
 
-Research contact: <claude@jo.ovanov.ch> (UZH).
+Research contact: <luka.jovanovic@uzh.ch> (UZH).
 
 ---
 
