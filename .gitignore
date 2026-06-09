@@ -142,3 +142,10 @@ vite.config.ts.timestamp-*
 # EinfachLesen build outputs
 build/
 releases/
+
+# macOS
+.DS_Store
+
+# Store screenshots (uploaded to the store dashboards by hand, not versioned)
+store-assets/screenshots/*.png
+store-assets/screenshots/raw/

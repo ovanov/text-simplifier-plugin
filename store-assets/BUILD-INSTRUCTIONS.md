@@ -15,7 +15,7 @@ Mozilla AMO requires that any extension built from source (TypeScript counts) in
 npm install
 
 # 2. Build for Firefox with the production backend URL.
-BACKEND_URL=https://<deployed-backend-url> npm run package:firefox
+BACKEND_URL=https://pub.cl.uzh.ch/projects/einfach-lesen npm run package:firefox
 
 # 3. The output is releases/einfachlesen-firefox-v<version>.zip.
 #    Rename to .xpi if uploading directly; AMO accepts either extension.

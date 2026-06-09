@@ -12,6 +12,6 @@ Required for the content script to inject the "✨ Text vereinfachen" button int
 
 Required for the content script to inject the "✨ Text vereinfachen" button into article paragraphs on the 20 Minuten news site. Same data discipline as SRF: paragraph text is only transmitted on explicit user click.
 
-## Host permission for the study backend (substituted at build time, e.g., `https://study.example.uzh.ch/*`)
+## Host permission for the study backend (substituted at build time: `https://pub.cl.uzh.ch/projects/einfach-lesen/*`)
 
 Required to send paragraph text and the source-page URL to the study's research backend, and to receive the simplified text in return. This is the sole network destination contacted by the extension. No third-party services are involved.
