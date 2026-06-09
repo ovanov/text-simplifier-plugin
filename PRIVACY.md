@@ -1,3 +1,8 @@
+---
+permalink: /PRIVACY
+title: EinfachLesen — Privacy Policy
+---
+
 # EinfachLesen — Privacy Policy
 
 _Last updated: 2026-05-01_
