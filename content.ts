@@ -33,6 +33,20 @@ function authPromptMessage(): string {
   return "Bitte erneut anmelden (Klicke auf das EinfachLesen-Symbol)";
 }
 
+function renderSentences(paragraph: HTMLParagraphElement, text: string): void {
+  paragraph.replaceChildren(); // clear existing content
+  const seg = new Intl.Segmenter("de", { granularity: "sentence" });
+  const sentences = [...seg.segment(text)]
+    .map((s) => s.segment.trim())
+    .filter(Boolean);
+  sentences.forEach((s, i) => {
+    paragraph.appendChild(document.createTextNode(s));
+    if (i < sentences.length - 1) {
+      paragraph.appendChild(document.createElement("br"));
+    }
+  });
+}
+
 function displayResult(
   targetElement: Element,
   simplifiedText: string,
@@ -52,7 +66,7 @@ function displayResult(
   label.appendChild(bold);
 
   const paragraph = document.createElement("p");
-  paragraph.textContent = simplifiedText;
+  renderSentences(paragraph, simplifiedText);
 
   const resimplifyBtn = document.createElement("button");
   resimplifyBtn.textContent = "Nochmals vereinfachen";
@@ -83,7 +97,7 @@ function displayResult(
     }
 
     lastSimplified = result.data.simplified_text;
-    paragraph.textContent = lastSimplified;
+    renderSentences(paragraph, lastSimplified);
     resimplifyBtn.textContent = "Nochmals vereinfachen";
     resimplifyBtn.disabled = false;
   };
