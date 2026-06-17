@@ -127,10 +127,13 @@ function isInCommentZone(p: Element, anchor: Element | null): boolean {
 
 function injectSimplifier(): void {
   const paragraphs = document.querySelectorAll("article p, .article-content p");
+  const commentAnchor = findCommentAnchor();
 
   paragraphs.forEach((p) => {
     if ((p as HTMLElement).dataset.simplified) return;
     (p as HTMLElement).dataset.simplified = "true";
+
+    if (isInCommentZone(p, commentAnchor)) return; // no button in comments
 
     const btn = document.createElement("button");
     btn.textContent = "✨ Text vereinfachen";
