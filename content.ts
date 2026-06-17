@@ -94,12 +94,46 @@ function displayResult(
   targetElement.after(resultDiv);
 }
 
+// Returns the element that begins the 20min comment section, or null.
+// Matched by visible heading text so it survives hashed/obfuscated CSS classes.
+function findCommentAnchor(): Element | null {
+  const candidates = document.querySelectorAll("h1, h2, h3, h4, strong, span, div");
+  for (const el of Array.from(candidates)) {
+    const text = (el.textContent ?? "").trim();
+    if (text.length > 40) continue; // headings are short; skip long body text
+    if (/^Deine Meinung zählt$/.test(text) || /^\d+\s+Kommentare?$/.test(text)) {
+      return el;
+    }
+  }
+  return null;
+}
+
+// True if the paragraph sits in a comment/aside region (Guard 1) or after the
+// comment-section anchor (Guard 2). Either condition suppresses the button.
+function isInCommentZone(p: Element, anchor: Element | null): boolean {
+  const blocked = p.closest(
+    '[class*="comment" i],[class*="kommentar" i],' +
+      '[id*="comment" i],[id*="kommentar" i],' +
+      "aside,[role=\"complementary\"],footer",
+  );
+  if (blocked) return true;
+
+  if (anchor) {
+    const rel = anchor.compareDocumentPosition(p);
+    if (rel & Node.DOCUMENT_POSITION_FOLLOWING) return true;
+  }
+  return false;
+}
+
 function injectSimplifier(): void {
   const paragraphs = document.querySelectorAll("article p, .article-content p");
+  const commentAnchor = findCommentAnchor();
 
   paragraphs.forEach((p) => {
     if ((p as HTMLElement).dataset.simplified) return;
     (p as HTMLElement).dataset.simplified = "true";
+
+    if (isInCommentZone(p, commentAnchor)) return; // no button in comments
 
     const btn = document.createElement("button");
     btn.textContent = "✨ Text vereinfachen";
