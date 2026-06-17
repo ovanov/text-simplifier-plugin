@@ -159,12 +159,15 @@ function injectSimplifier(): void {
 
     if (isInCommentZone(p, commentAnchor)) return; // no button in comments
 
+    // Capture the paragraph text BEFORE prepending the button, otherwise the
+    // button label leaks into innerText and pollutes original_text server-side.
+    const originalText = (p as HTMLElement).innerText;
+
     const btn = document.createElement("button");
     btn.textContent = "✨ Text vereinfachen";
     btn.className = "simplify-btn";
 
     btn.onclick = async () => {
-      const originalText = (p as HTMLElement).innerText;
       btn.textContent = "⏳ Verarbeite...";
       btn.disabled = true;
 
