@@ -94,6 +94,20 @@ function displayResult(
   targetElement.after(resultDiv);
 }
 
+// Returns the element that begins the 20min comment section, or null.
+// Matched by visible heading text so it survives hashed/obfuscated CSS classes.
+function findCommentAnchor(): Element | null {
+  const candidates = document.querySelectorAll("h1, h2, h3, h4, strong, span, div");
+  for (const el of Array.from(candidates)) {
+    const text = (el.textContent ?? "").trim();
+    if (text.length > 40) continue; // headings are short; skip long body text
+    if (/^Deine Meinung zählt$/.test(text) || /^\d+\s+Kommentare?$/.test(text)) {
+      return el;
+    }
+  }
+  return null;
+}
+
 function injectSimplifier(): void {
   const paragraphs = document.querySelectorAll("article p, .article-content p");
 
