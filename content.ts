@@ -1,5 +1,6 @@
 interface SimplifyResponse {
   simplified_text: string;
+  at_floor?: boolean;
 }
 
 type ApiResult<T> =
@@ -99,6 +100,14 @@ function displayResult(
 
     lastSimplified = result.data.simplified_text;
     renderSentences(paragraph, lastSimplified);
+
+    if (result.data.at_floor) {
+      // Lowest level reached — no further simplification possible.
+      resimplifyBtn.textContent = "Keine weitere Vereinfachung möglich";
+      resimplifyBtn.disabled = true;
+      return;
+    }
+
     resimplifyBtn.textContent = "Nochmals vereinfachen";
     resimplifyBtn.disabled = false;
   };
