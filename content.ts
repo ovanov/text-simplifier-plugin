@@ -108,6 +108,23 @@ function findCommentAnchor(): Element | null {
   return null;
 }
 
+// True if the paragraph sits in a comment/aside region (Guard 1) or after the
+// comment-section anchor (Guard 2). Either condition suppresses the button.
+function isInCommentZone(p: Element, anchor: Element | null): boolean {
+  const blocked = p.closest(
+    '[class*="comment" i],[class*="kommentar" i],' +
+      '[id*="comment" i],[id*="kommentar" i],' +
+      "aside,[role=\"complementary\"],footer",
+  );
+  if (blocked) return true;
+
+  if (anchor) {
+    const rel = anchor.compareDocumentPosition(p);
+    if (rel & Node.DOCUMENT_POSITION_FOLLOWING) return true;
+  }
+  return false;
+}
+
 function injectSimplifier(): void {
   const paragraphs = document.querySelectorAll("article p, .article-content p");
 
