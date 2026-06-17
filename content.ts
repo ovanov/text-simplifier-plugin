@@ -35,6 +35,7 @@ function authPromptMessage(): string {
 
 function renderSentences(paragraph: HTMLParagraphElement, text: string): void {
   paragraph.replaceChildren(); // clear existing content
+  if (!text.trim()) return;
   const seg = new Intl.Segmenter("de", { granularity: "sentence" });
   const sentences = [...seg.segment(text)]
     .map((s) => s.segment.trim())
