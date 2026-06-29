@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "EinfachLesen",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Vereinfacht deutsche Nachrichtenartikel für L2-Lernende (Forschungsstudie der Universität Zürich).",
   "icons": {
     "16": "icons/icon-16.png",
